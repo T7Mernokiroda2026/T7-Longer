@@ -30,6 +30,7 @@
   .ver{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted2);pointer-events:none;white-space:nowrap}
   .wakebar{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted2);text-align:center;flex:0 0 auto;min-height:13px;line-height:13px}
   .wakebar.ok{color:var(--green)} .wakebar.err{color:var(--amber)}
+  #nosleep{position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0}
   .brand{display:flex;align-items:center;gap:9px}
   .dot{width:10px;height:10px;border-radius:50%;background:var(--muted2);transition:background .3s}
   .dot.live{background:var(--green);animation:pulse 1.6s infinite}
@@ -124,11 +125,12 @@
 <div id="app">
   <header>
     <div class="brand"><span class="dot" id="statusDot"></span><b>Szelvény</b></div>
-    <span class="ver" id="ver">v2.1</span>
+    <span class="ver" id="ver">v2.2</span>
     <div class="stat" id="netInfo">— szakasz</div>
   </header>
 
   <div class="wakebar" id="wake">ébrentartás indítása…</div>
+  <video id="nosleep" muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"><source src="data:video/mp4;base64,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" type="video/mp4"><source src="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAQqEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggQU7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECziAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYhGQQPLalK3DpyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhAvrwgDgibCBQLqBQJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYhGQQPLalK3DmfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDUuMDAwMDAwMDAwAB9DtnVCb+eBAKOqgQAAgPACAJ0BKkAAQAAARwiFhYiFhIgCAgAGcDxCYAqyIPcwAP7/q1CAo5aBAMgA0QEABRCsABgAGFgv9AAIjoAAo5aBAZAA0QEABRCsABgAGFgv9AAIjoAAo5aBAlgA0QEABRCsABgAGFgv9AAIjoAAo5aBAyAA0QEABRCsABgAGFgv9AAIjoAAo5aBA+gA0QEABRCsABgAGFgv9AAIjoAAo5aBBLAA0QEABRCsABgAGFgv9AAIjoAAo5aBBXgA0QEABRAQFGAAYWC/0AAiOgAAo5aBBkAA0QEABRCsABgAGFgv9AAIjoAAo5aBBwgA0QEABRCsABgAGFgv9AAIjoAAo5aBB9AA0QEABRCsABgAGFgv9AAIjoAAo5aBCJgA0QEABRCsABgAGFgv9AAIjoAAo5aBCWAA0QEABRCsABgAGFgv9AAIjoAAo5aBCigA0QEABRCsABgAGFgv9AAIjoAAo5aBCvAA0QEABRCsABgAGFgv9AAIjoAAo5aBC7gA0QEABRCsABgAGFgv9AAIjoAAo5aBDIAA0QEABRCsABgAGFgv9AAIjoAAo5aBDUgA0QEABRCsABgAGFgv9AAIjoAAo5aBDhAA0QEABRAQFGAAYWC/0AAiOgAAo5aBDtgA0QEABRCsABgAGFgv9AAIjoAAo5aBD6AA0QEABRCsABgAGFgv9AAIjoAAo5aBEGgA0QEABRCsABgAGFgv9AAIjoAAo5aBETAA0QEABRCsABgAGFgv9AAIjoAAo5aBEfgA0QEABRCsABgAGFgv9AAIjoAAo5aBEsAA0QEABRCsABgAGFgv9AAIjoAAHFO7a5G7j7OBALeK94EB8YIBn/CBAw==" type="video/webm"></video>
 
   <div class="card readout">
     <div class="label">Út</div>
@@ -452,28 +454,35 @@ function drawMap(qx,qy,best){
   ctx.beginPath();ctx.arc(m[0],m[1],6*DPR,0,7);ctx.fill();ctx.stroke();
 };
 
-/* ===== képernyő ébren tartása (Screen Wake Lock) ===== */
-var wakeLock=null,wakePending=false;
+/* ===== képernyő ébren tartása: Wake Lock + videós tartalék ===== */
+var wakeLock=null,wakePending=false,noSleepOn=false;
 function wakeStatus(txt,cls){var e=el("wake");if(!e)return;e.textContent=txt;e.className="wakebar"+(cls?" "+cls:"");}
+function playNoSleep(){
+  var v=el("nosleep");if(!v||noSleepOn)return;
+  var p=v.play();
+  if(p&&p.then){
+    p.then(function(){noSleepOn=true;if(!wakeLock)wakeStatus("✓ képernyő ébren (videós mód)","ok");})
+     .catch(function(){if(!wakeLock&&!noSleepOn)wakeStatus("nem sikerült ébren tartani – kapcsold ki az energiatakarékos módot, majd koppints","err");});
+  }
+}
+function stopNoSleep(){var v=el("nosleep");if(v){try{v.pause();}catch(e){}}noSleepOn=false;}
 async function requestWakeLock(){
-  if(!window.isSecureContext){wakeStatus("ébrentartás: csak HTTPS-en működik (nem file://)","err");return;}
-  if(!("wakeLock" in navigator)){wakeStatus("ébrentartás: a böngésző nem támogatja","err");return;}
-  if(wakeLock||wakePending)return;
+  if(!window.isSecureContext||!("wakeLock" in navigator)||wakeLock||wakePending)return;
   wakePending=true;
   try{
     wakeLock=await navigator.wakeLock.request("screen");
+    stopNoSleep();
     wakeStatus("✓ képernyő ébren tartva","ok");
-    wakeLock.addEventListener("release",function(){wakeLock=null;wakeStatus("ébrentartás szünetel (koppints)","");});
-  }catch(e){wakeStatus("ébrentartás hiba: "+((e&&e.name)||e),"err");}
+    wakeLock.addEventListener("release",function(){wakeLock=null;});
+  }catch(e){/* a videós tartalék veszi át */}
   wakePending=false;
 }
-/* ha visszatérünk az oldalra (tabváltás/zárolás után), újra megkérjük */
-document.addEventListener("visibilitychange",function(){
-  if(document.visibilityState==="visible")requestWakeLock();
-});
-/* tartalék: egyes böngészők felhasználói gesztust kérnek — első koppintásra is próbáljuk */
-window.addEventListener("pointerdown",requestWakeLock);
-requestWakeLock();
+function keepAwake(){requestWakeLock();if(!wakeLock)playNoSleep();}
+/* visszatéréskor (tabváltás/zárolás után) újra */
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){noSleepOn=false;keepAwake();}});
+/* minden koppintásra megpróbáljuk (egyes böngészők gesztust kérnek) */
+window.addEventListener("pointerdown",keepAwake);
+keepAwake();
 
 /* ===== boot ===== */
 (async function(){try{
