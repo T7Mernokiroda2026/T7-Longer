@@ -28,6 +28,8 @@
 
   header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto;position:relative}
   .ver{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted2);pointer-events:none;white-space:nowrap}
+  .wakebar{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted2);text-align:center;flex:0 0 auto;min-height:13px;line-height:13px}
+  .wakebar.ok{color:var(--green)} .wakebar.err{color:var(--amber)}
   .brand{display:flex;align-items:center;gap:9px}
   .dot{width:10px;height:10px;border-radius:50%;background:var(--muted2);transition:background .3s}
   .dot.live{background:var(--green);animation:pulse 1.6s infinite}
@@ -122,9 +124,11 @@
 <div id="app">
   <header>
     <div class="brand"><span class="dot" id="statusDot"></span><b>Szelvény</b></div>
-    <span class="ver" id="ver">v2.0</span>
+    <span class="ver" id="ver">v2.1</span>
     <div class="stat" id="netInfo">— szakasz</div>
   </header>
+
+  <div class="wakebar" id="wake">ébrentartás indítása…</div>
 
   <div class="card readout">
     <div class="label">Út</div>
@@ -450,13 +454,17 @@ function drawMap(qx,qy,best){
 
 /* ===== képernyő ébren tartása (Screen Wake Lock) ===== */
 var wakeLock=null,wakePending=false;
+function wakeStatus(txt,cls){var e=el("wake");if(!e)return;e.textContent=txt;e.className="wakebar"+(cls?" "+cls:"");}
 async function requestWakeLock(){
-  if(!("wakeLock" in navigator)||wakeLock||wakePending)return;
+  if(!window.isSecureContext){wakeStatus("ébrentartás: csak HTTPS-en működik (nem file://)","err");return;}
+  if(!("wakeLock" in navigator)){wakeStatus("ébrentartás: a böngésző nem támogatja","err");return;}
+  if(wakeLock||wakePending)return;
   wakePending=true;
   try{
     wakeLock=await navigator.wakeLock.request("screen");
-    wakeLock.addEventListener("release",function(){wakeLock=null;});
-  }catch(e){/* megtagadva vagy nem elérhető (pl. file://, nem HTTPS) */}
+    wakeStatus("✓ képernyő ébren tartva","ok");
+    wakeLock.addEventListener("release",function(){wakeLock=null;wakeStatus("ébrentartás szünetel (koppints)","");});
+  }catch(e){wakeStatus("ébrentartás hiba: "+((e&&e.name)||e),"err");}
   wakePending=false;
 }
 /* ha visszatérünk az oldalra (tabváltás/zárolás után), újra megkérjük */
