@@ -446,6 +446,25 @@ function drawMap(qx,qy,best){
   ctx.beginPath();ctx.arc(m[0],m[1],6*DPR,0,7);ctx.fill();ctx.stroke();
 };
 
+/* ===== képernyő ébren tartása (Screen Wake Lock) ===== */
+var wakeLock=null,wakePending=false;
+async function requestWakeLock(){
+  if(!("wakeLock" in navigator)||wakeLock||wakePending)return;
+  wakePending=true;
+  try{
+    wakeLock=await navigator.wakeLock.request("screen");
+    wakeLock.addEventListener("release",function(){wakeLock=null;});
+  }catch(e){/* megtagadva vagy nem elérhető (pl. file://, nem HTTPS) */}
+  wakePending=false;
+}
+/* ha visszatérünk az oldalra (tabváltás/zárolás után), újra megkérjük */
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible")requestWakeLock();
+});
+/* tartalék: egyes böngészők felhasználói gesztust kérnek — első koppintásra is próbáljuk */
+window.addEventListener("pointerdown",requestWakeLock);
+requestWakeLock();
+
 /* ===== boot ===== */
 (async function(){try{
   el("ltext").textContent="Kitömörítés…";var gz=b64ToBytes(DATA_B64);var raw=await gunzip(gz);
